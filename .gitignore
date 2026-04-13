@@ -31,6 +31,10 @@ artifacts/
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
+# App configuration (use environment variables or secret manager)
+appsettings*.json
+!appsettings.Example.json
+
 # NuGet Packages
 *.nupkg
 # NuGet Symbol Packages

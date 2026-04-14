@@ -1,4 +1,4 @@
-namespace TaskTrack.Api.Domain.Entities;
+namespace TaskTrack.Domain.Entities;
 
 public class LocalFilho
 {
@@ -9,3 +9,4 @@ public class LocalFilho
     public LocalPai LocalPai { get; set; } = null!;
     public ICollection<Solicitacao> Solicitacoes { get; set; } = new List<Solicitacao>();
 }
+

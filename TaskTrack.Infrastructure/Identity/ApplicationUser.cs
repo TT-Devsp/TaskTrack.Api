@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace TaskTrack.Api.Identity;
+namespace TaskTrack.Infrastructure.Identity;
 
 public class ApplicationUser : IdentityUser<Guid>
 {
 }
+

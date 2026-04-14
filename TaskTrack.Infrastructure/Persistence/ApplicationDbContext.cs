@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using TaskTrack.Api.Domain.Entities;
-using TaskTrack.Api.Identity;
+using TaskTrack.Domain.Entities;
+using TaskTrack.Infrastructure.Identity;
 
-namespace TaskTrack.Api.Infrastructure.Persistence;
+namespace TaskTrack.Infrastructure.Persistence;
 
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
@@ -202,3 +202,4 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .OnDelete(DeleteBehavior.SetNull);
     }
 }
+

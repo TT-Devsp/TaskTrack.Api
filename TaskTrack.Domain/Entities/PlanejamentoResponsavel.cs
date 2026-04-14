@@ -1,4 +1,4 @@
-namespace TaskTrack.Api.Domain.Entities;
+namespace TaskTrack.Domain.Entities;
 
 public class PlanejamentoResponsavel
 {
@@ -8,3 +8,4 @@ public class PlanejamentoResponsavel
 
     public Planejamento Planejamento { get; set; } = null!;
 }
+

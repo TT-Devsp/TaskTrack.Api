@@ -1,4 +1,4 @@
-namespace TaskTrack.Api.Domain.Entities;
+namespace TaskTrack.Domain.Entities;
 
 public class Planejamento
 {
@@ -12,3 +12,4 @@ public class Planejamento
     public ICollection<PlanejamentoResponsavel> Responsaveis { get; set; } = new List<PlanejamentoResponsavel>();
     public ICollection<PlanejamentoMaterial> Materiais { get; set; } = new List<PlanejamentoMaterial>();
 }
+

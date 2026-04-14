@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using TaskTrack.Api.Infrastructure.Persistence;
+using TaskTrack.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace TaskTrack.Api.Migrations
+namespace TaskTrack.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -152,7 +152,7 @@ namespace TaskTrack.Api.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.AprovacaoSolicitacao", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.AprovacaoSolicitacao", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -188,7 +188,7 @@ namespace TaskTrack.Api.Migrations
                     b.ToTable("aprovacoes_solicitacao", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.Execucao", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.Execucao", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -232,7 +232,7 @@ namespace TaskTrack.Api.Migrations
                     b.ToTable("execucoes", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.LocalFilho", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.LocalFilho", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -259,7 +259,7 @@ namespace TaskTrack.Api.Migrations
                     b.ToTable("local_filho", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.LocalPai", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.LocalPai", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -282,7 +282,7 @@ namespace TaskTrack.Api.Migrations
                     b.ToTable("local_pai", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.Planejamento", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.Planejamento", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -312,7 +312,7 @@ namespace TaskTrack.Api.Migrations
                     b.ToTable("planejamentos", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.PlanejamentoMaterial", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.PlanejamentoMaterial", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -344,7 +344,7 @@ namespace TaskTrack.Api.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.PlanejamentoResponsavel", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.PlanejamentoResponsavel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -368,7 +368,7 @@ namespace TaskTrack.Api.Migrations
                     b.ToTable("planejamento_responsaveis", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.Solicitacao", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.Solicitacao", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -418,7 +418,7 @@ namespace TaskTrack.Api.Migrations
                     b.ToTable("solicitacoes", (string)null);
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("TaskTrack.Infrastructure.Identity.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -494,7 +494,7 @@ namespace TaskTrack.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("TaskTrack.Api.Identity.ApplicationUser", null)
+                    b.HasOne("TaskTrack.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -503,7 +503,7 @@ namespace TaskTrack.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("TaskTrack.Api.Identity.ApplicationUser", null)
+                    b.HasOne("TaskTrack.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -518,7 +518,7 @@ namespace TaskTrack.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskTrack.Api.Identity.ApplicationUser", null)
+                    b.HasOne("TaskTrack.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -527,22 +527,22 @@ namespace TaskTrack.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("TaskTrack.Api.Identity.ApplicationUser", null)
+                    b.HasOne("TaskTrack.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.AprovacaoSolicitacao", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.AprovacaoSolicitacao", b =>
                 {
-                    b.HasOne("TaskTrack.Api.Identity.ApplicationUser", null)
+                    b.HasOne("TaskTrack.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("GestorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TaskTrack.Api.Domain.Entities.Solicitacao", "Solicitacao")
+                    b.HasOne("TaskTrack.Domain.Entities.Solicitacao", "Solicitacao")
                         .WithMany("Aprovacoes")
                         .HasForeignKey("SolicitacaoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -551,14 +551,14 @@ namespace TaskTrack.Api.Migrations
                     b.Navigation("Solicitacao");
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.Execucao", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.Execucao", b =>
                 {
-                    b.HasOne("TaskTrack.Api.Identity.ApplicationUser", null)
+                    b.HasOne("TaskTrack.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("AtualizadoPorId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TaskTrack.Api.Domain.Entities.Solicitacao", "Solicitacao")
+                    b.HasOne("TaskTrack.Domain.Entities.Solicitacao", "Solicitacao")
                         .WithMany("Execucoes")
                         .HasForeignKey("SolicitacaoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -567,9 +567,9 @@ namespace TaskTrack.Api.Migrations
                     b.Navigation("Solicitacao");
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.LocalFilho", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.LocalFilho", b =>
                 {
-                    b.HasOne("TaskTrack.Api.Domain.Entities.LocalPai", "LocalPai")
+                    b.HasOne("TaskTrack.Domain.Entities.LocalPai", "LocalPai")
                         .WithMany("LocaisFilho")
                         .HasForeignKey("LocalPaiId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -578,9 +578,9 @@ namespace TaskTrack.Api.Migrations
                     b.Navigation("LocalPai");
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.Planejamento", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.Planejamento", b =>
                 {
-                    b.HasOne("TaskTrack.Api.Domain.Entities.Solicitacao", "Solicitacao")
+                    b.HasOne("TaskTrack.Domain.Entities.Solicitacao", "Solicitacao")
                         .WithMany("Planejamentos")
                         .HasForeignKey("SolicitacaoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -589,9 +589,9 @@ namespace TaskTrack.Api.Migrations
                     b.Navigation("Solicitacao");
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.PlanejamentoMaterial", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.PlanejamentoMaterial", b =>
                 {
-                    b.HasOne("TaskTrack.Api.Domain.Entities.Planejamento", "Planejamento")
+                    b.HasOne("TaskTrack.Domain.Entities.Planejamento", "Planejamento")
                         .WithMany("Materiais")
                         .HasForeignKey("PlanejamentoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -600,15 +600,15 @@ namespace TaskTrack.Api.Migrations
                     b.Navigation("Planejamento");
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.PlanejamentoResponsavel", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.PlanejamentoResponsavel", b =>
                 {
-                    b.HasOne("TaskTrack.Api.Domain.Entities.Planejamento", "Planejamento")
+                    b.HasOne("TaskTrack.Domain.Entities.Planejamento", "Planejamento")
                         .WithMany("Responsaveis")
                         .HasForeignKey("PlanejamentoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TaskTrack.Api.Identity.ApplicationUser", null)
+                    b.HasOne("TaskTrack.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -617,21 +617,21 @@ namespace TaskTrack.Api.Migrations
                     b.Navigation("Planejamento");
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.Solicitacao", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.Solicitacao", b =>
                 {
-                    b.HasOne("TaskTrack.Api.Domain.Entities.LocalPai", "LocalPai")
+                    b.HasOne("TaskTrack.Domain.Entities.LocalPai", "LocalPai")
                         .WithMany("Solicitacoes")
                         .HasForeignKey("LocalPaiId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TaskTrack.Api.Identity.ApplicationUser", null)
+                    b.HasOne("TaskTrack.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("SolicitanteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TaskTrack.Api.Domain.Entities.LocalFilho", "LocalFilho")
+                    b.HasOne("TaskTrack.Domain.Entities.LocalFilho", "LocalFilho")
                         .WithMany("Solicitacoes")
                         .HasForeignKey("LocalFilhoId", "LocalPaiId")
                         .HasPrincipalKey("Id", "LocalPaiId")
@@ -642,26 +642,26 @@ namespace TaskTrack.Api.Migrations
                     b.Navigation("LocalPai");
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.LocalFilho", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.LocalFilho", b =>
                 {
                     b.Navigation("Solicitacoes");
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.LocalPai", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.LocalPai", b =>
                 {
                     b.Navigation("LocaisFilho");
 
                     b.Navigation("Solicitacoes");
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.Planejamento", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.Planejamento", b =>
                 {
                     b.Navigation("Materiais");
 
                     b.Navigation("Responsaveis");
                 });
 
-            modelBuilder.Entity("TaskTrack.Api.Domain.Entities.Solicitacao", b =>
+            modelBuilder.Entity("TaskTrack.Domain.Entities.Solicitacao", b =>
                 {
                     b.Navigation("Aprovacoes");
 

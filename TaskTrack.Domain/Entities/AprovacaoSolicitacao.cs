@@ -1,4 +1,4 @@
-namespace TaskTrack.Api.Domain.Entities;
+namespace TaskTrack.Domain.Entities;
 
 public class AprovacaoSolicitacao
 {
@@ -11,3 +11,4 @@ public class AprovacaoSolicitacao
 
     public Solicitacao Solicitacao { get; set; } = null!;
 }
+

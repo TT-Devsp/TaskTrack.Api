@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace TaskTrack.Api.Migrations
+namespace TaskTrack.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -171,6 +171,26 @@ namespace TaskTrack.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "local_filho",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    local_pai_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    nome = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_local_filho", x => x.id);
+                    table.UniqueConstraint("AK_local_filho_id_local_pai_id", x => new { x.id, x.local_pai_id });
+                    table.ForeignKey(
+                        name: "FK_local_filho_local_pai_local_pai_id",
+                        column: x => x.local_pai_id,
+                        principalTable: "local_pai",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "solicitacoes",
                 columns: table => new
                 {
@@ -179,7 +199,8 @@ namespace TaskTrack.Api.Migrations
                     descricao = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<int>(type: "integer", nullable: false),
                     data_criacao = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    local_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    local_pai_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    local_filho_id = table.Column<Guid>(type: "uuid", nullable: true),
                     solicitante_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -192,8 +213,14 @@ namespace TaskTrack.Api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_solicitacoes_local_pai_local_id",
-                        column: x => x.local_id,
+                        name: "FK_solicitacoes_local_filho_local_filho_id_local_pai_id",
+                        columns: x => new { x.local_filho_id, x.local_pai_id },
+                        principalTable: "local_filho",
+                        principalColumns: new[] { "id", "local_pai_id" },
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_solicitacoes_local_pai_local_pai_id",
+                        column: x => x.local_pai_id,
                         principalTable: "local_pai",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -382,6 +409,17 @@ namespace TaskTrack.Api.Migrations
                 column: "solicitacao_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_local_filho_local_pai_id",
+                table: "local_filho",
+                column: "local_pai_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_local_filho_local_pai_id_nome",
+                table: "local_filho",
+                columns: new[] { "local_pai_id", "nome" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_planejamento_materiais_planejamento_id",
                 table: "planejamento_materiais",
                 column: "planejamento_id");
@@ -402,9 +440,19 @@ namespace TaskTrack.Api.Migrations
                 column: "solicitacao_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_solicitacoes_local_id",
+                name: "IX_solicitacoes_local_filho_id",
                 table: "solicitacoes",
-                column: "local_id");
+                column: "local_filho_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_solicitacoes_local_filho_id_local_pai_id",
+                table: "solicitacoes",
+                columns: new[] { "local_filho_id", "local_pai_id" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_solicitacoes_local_pai_id",
+                table: "solicitacoes",
+                column: "local_pai_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_solicitacoes_solicitante_id",
@@ -453,6 +501,9 @@ namespace TaskTrack.Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "local_filho");
 
             migrationBuilder.DropTable(
                 name: "local_pai");

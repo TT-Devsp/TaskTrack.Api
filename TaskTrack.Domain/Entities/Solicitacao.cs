@@ -1,4 +1,4 @@
-namespace TaskTrack.Api.Domain.Entities;
+namespace TaskTrack.Domain.Entities;
 
 public class Solicitacao
 {
@@ -17,3 +17,4 @@ public class Solicitacao
     public ICollection<Planejamento> Planejamentos { get; set; } = new List<Planejamento>();
     public ICollection<Execucao> Execucoes { get; set; } = new List<Execucao>();
 }
+

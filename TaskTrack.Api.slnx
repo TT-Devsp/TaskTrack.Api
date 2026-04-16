@@ -1,6 +1,6 @@
 <Solution>
-  <Project Path="TaskTrack.Api.csproj" />
-  <Project Path="TaskTrack.Application/TaskTrack.Application.csproj" />
-  <Project Path="TaskTrack.Domain/TaskTrack.Domain.csproj" />
+  <Project Path="TaskTrack.Api/TaskTrack.Api.csproj" />
   <Project Path="TaskTrack.Infrastructure/TaskTrack.Infrastructure.csproj" />
+  <Project Path="TaskTrack.Domain/TaskTrack.Domain.csproj" />
+  <Project Path="TaskTrack.Application/TaskTrack.Application.csproj" />
 </Solution>

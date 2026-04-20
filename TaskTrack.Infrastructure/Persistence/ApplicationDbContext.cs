@@ -13,8 +13,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
     }
 
-    public DbSet<LocalPai> LocaisPai => Set<LocalPai>();
-    public DbSet<LocalFilho> LocaisFilho => Set<LocalFilho>();
     public DbSet<Solicitacao> Solicitacoes => Set<Solicitacao>();
     public DbSet<AprovacaoSolicitacao> AprovacoesSolicitacao => Set<AprovacaoSolicitacao>();
     public DbSet<Planejamento> Planejamentos => Set<Planejamento>();
@@ -26,34 +24,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<LocalPai>(entity =>
-        {
-            entity.ToTable("local_pai");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.Id).HasColumnName("id");
-            entity.Property(x => x.Nome).HasColumnName("nome").HasMaxLength(150).IsRequired();
-            entity.Property(x => x.Endereco).HasColumnName("endereco").HasMaxLength(300);
-        });
-
-        builder.Entity<LocalFilho>(entity =>
-        {
-            entity.ToTable("local_filho");
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.Id).HasColumnName("id");
-            entity.Property(x => x.LocalPaiId).HasColumnName("local_pai_id").IsRequired();
-            entity.Property(x => x.Nome).HasColumnName("nome").HasMaxLength(150).IsRequired();
-
-            entity.HasAlternateKey(x => new { x.Id, x.LocalPaiId });
-
-            entity.HasOne(x => x.LocalPai)
-                .WithMany(x => x.LocaisFilho)
-                .HasForeignKey(x => x.LocalPaiId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasIndex(x => x.LocalPaiId);
-            entity.HasIndex(x => new { x.LocalPaiId, x.Nome }).IsUnique();
-        });
-
         builder.Entity<Solicitacao>(entity =>
         {
             entity.ToTable("solicitacoes");
@@ -61,25 +31,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.Property(x => x.Id).HasColumnName("id");
             entity.Property(x => x.Titulo).HasColumnName("titulo").HasMaxLength(200).IsRequired();
             entity.Property(x => x.Descricao).HasColumnName("descricao");
+            entity.Property(x => x.Localizacao).HasColumnName("localizacao").HasMaxLength(500).IsRequired();
             entity.Property(x => x.Status).HasColumnName("status").IsRequired();
-            entity.Property(x => x.DataCriacao).HasColumnName("data_criacao").IsRequired();
-            entity.Property(x => x.LocalPaiId).HasColumnName("local_pai_id").IsRequired();
-            entity.Property(x => x.LocalFilhoId).HasColumnName("local_filho_id");
+            entity.Property(x => x.DataCriacao).HasColumnName("data_criacao").HasColumnType("timestamp(0) without time zone").IsRequired();
             entity.Property(x => x.SolicitanteId).HasColumnName("solicitante_id").IsRequired();
-
-            entity.HasOne(x => x.LocalPai)
-                .WithMany(x => x.Solicitacoes)
-                .HasForeignKey(x => x.LocalPaiId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasOne(x => x.LocalFilho)
-                .WithMany(x => x.Solicitacoes)
-                .HasForeignKey(x => new { x.LocalFilhoId, x.LocalPaiId })
-                .HasPrincipalKey(x => new { x.Id, x.LocalPaiId })
-                .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasIndex(x => x.LocalPaiId);
-            entity.HasIndex(x => x.LocalFilhoId);
             entity.HasIndex(x => x.SolicitanteId);
         });
 

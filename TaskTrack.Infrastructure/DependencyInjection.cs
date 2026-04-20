@@ -2,8 +2,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TaskTrack.Application.Interfaces;
+using TaskTrack.Application.Services;
+using TaskTrack.Domain.Interfaces;
 using TaskTrack.Infrastructure.Identity;
 using TaskTrack.Infrastructure.Persistence;
+using TaskTrack.Infrastructure.Repositories;
 
 namespace TaskTrack.Infrastructure;
 
@@ -24,6 +28,9 @@ public static class DependencyInjection
             })
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
+
+        services.AddScoped<ISolicitacoesRepository, SolicitacoesRepository>();
+        services.AddScoped<ISolicitacoesService, SolicitacoesService>();
 
         return services;
     }

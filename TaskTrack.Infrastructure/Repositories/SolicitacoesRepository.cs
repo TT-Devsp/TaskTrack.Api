@@ -26,11 +26,29 @@ public sealed class SolicitacoesRepository : ISolicitacoesRepository
             .AnyAsync(x => x.Id == solicitanteId, cancellationToken);
     }
 
+    public Task<bool> HasGestorApprovalAsync(Guid solicitacaoId, CancellationToken cancellationToken = default)
+    {
+        return _dbContext.AprovacoesSolicitacao
+            .AsNoTracking()
+            .AnyAsync(x => x.SolicitacaoId == solicitacaoId && x.Aprovado, cancellationToken);
+    }
+
     public Task<Solicitacao?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return _dbContext.Solicitacoes
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+    }
+
+    public Task<Solicitacao?> GetByIdForUpdateAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return _dbContext.Solicitacoes
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+    }
+
+    public void Remove(Solicitacao solicitacao)
+    {
+        _dbContext.Solicitacoes.Remove(solicitacao);
     }
 
     public async Task<IReadOnlyCollection<Solicitacao>> GetAllAsync(CancellationToken cancellationToken = default)

@@ -66,6 +66,63 @@ public sealed class SolicitacoesService : ISolicitacoesService
         return ToResponse(solicitacaoPersistida);
     }
 
+    public async Task<SolicitacaoResponse> UpdateAsync(Guid id, UpdateSolicitacaoRequest request, Guid solicitanteId, CancellationToken cancellationToken = default)
+    {
+        var solicitacao = await _solicitacoesRepository.GetByIdForUpdateAsync(id, cancellationToken);
+        if (solicitacao is null)
+        {
+            throw new KeyNotFoundException("Solicitacao informada nao foi encontrada.");
+        }
+
+        ValidateSolicitanteOwnership(solicitacao, solicitanteId);
+        await ValidateNoManagerApprovalAsync(id, cancellationToken);
+
+        var titulo = request.Titulo?.Trim();
+        if (string.IsNullOrWhiteSpace(titulo))
+        {
+            throw new ArgumentException("O titulo da solicitacao e obrigatorio.");
+        }
+
+        if (titulo.Length > TituloMaxLength)
+        {
+            throw new ArgumentException($"O titulo deve ter no maximo {TituloMaxLength} caracteres.");
+        }
+
+        var localizacao = request.Localizacao?.Trim();
+        if (string.IsNullOrWhiteSpace(localizacao))
+        {
+            throw new ArgumentException("A localizacao da solicitacao e obrigatoria.");
+        }
+
+        if (localizacao.Length > LocalizacaoMaxLength)
+        {
+            throw new ArgumentException($"A localizacao deve ter no maximo {LocalizacaoMaxLength} caracteres.");
+        }
+
+        solicitacao.Titulo = titulo;
+        solicitacao.Descricao = string.IsNullOrWhiteSpace(request.Descricao) ? null : request.Descricao.Trim();
+        solicitacao.Localizacao = localizacao;
+
+        await _solicitacoesRepository.SaveChangesAsync(cancellationToken);
+
+        return ToResponse(solicitacao);
+    }
+
+    public async Task DeleteAsync(Guid id, Guid solicitanteId, CancellationToken cancellationToken = default)
+    {
+        var solicitacao = await _solicitacoesRepository.GetByIdForUpdateAsync(id, cancellationToken);
+        if (solicitacao is null)
+        {
+            throw new KeyNotFoundException("Solicitacao informada nao foi encontrada.");
+        }
+
+        ValidateSolicitanteOwnership(solicitacao, solicitanteId);
+        await ValidateNoManagerApprovalAsync(id, cancellationToken);
+
+        _solicitacoesRepository.Remove(solicitacao);
+        await _solicitacoesRepository.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyCollection<SolicitacaoResponse>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var solicitacoes = await _solicitacoesRepository.GetAllAsync(cancellationToken);
@@ -84,6 +141,23 @@ public sealed class SolicitacoesService : ISolicitacoesService
         }
 
         return ToResponse(solicitacao);
+    }
+
+    private static void ValidateSolicitanteOwnership(Solicitacao solicitacao, Guid solicitanteId)
+    {
+        if (solicitacao.SolicitanteId != solicitanteId)
+        {
+            throw new UnauthorizedAccessException("Apenas o solicitante pode alterar ou excluir a solicitacao.");
+        }
+    }
+
+    private async Task ValidateNoManagerApprovalAsync(Guid solicitacaoId, CancellationToken cancellationToken)
+    {
+        var hasGestorApproval = await _solicitacoesRepository.HasGestorApprovalAsync(solicitacaoId, cancellationToken);
+        if (hasGestorApproval)
+        {
+            throw new InvalidOperationException("Solicitacao aprovada pelo gestor nao pode ser alterada ou excluida.");
+        }
     }
 
     private static SolicitacaoResponse ToResponse(Solicitacao solicitacao)

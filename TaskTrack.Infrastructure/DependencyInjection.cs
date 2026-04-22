@@ -31,6 +31,8 @@ public static class DependencyInjection
 
         services.AddScoped<ISolicitacoesRepository, SolicitacoesRepository>();
         services.AddScoped<ISolicitacoesService, SolicitacoesService>();
+        services.AddScoped<IPlanejamentosRepository, PlanejamentosRepository>();
+        services.AddScoped<IPlanejamentosService, PlanejamentosService>();
 
         return services;
     }

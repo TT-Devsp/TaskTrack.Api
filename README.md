@@ -22,8 +22,8 @@ Obrigatorio para debug com breakpoints:
 1. Clone o repositorio:
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
-cd p-pi-2026
+git clone https://github.com/TT-Devsp/TaskTrack.Api.git
+cd TaskTrack.Api
 ```
 
 2. (Opcional) Crie um arquivo `.env` para customizar portas/credenciais locais:
@@ -43,7 +43,7 @@ Copy-Item .env.example .env
 Suba tudo:
 
 ```bash
-docker compose up --build -d
+docker compose up -d
 ```
 
 Abra o Swagger:
@@ -57,6 +57,12 @@ Detalhes:
 - O servico `postgres` sobe o banco
 - O servico `api` builda e sobe a API
 - As migrations sao aplicadas automaticamente no startup da API
+
+Quando voce alterar Dockerfile/dependencias da imagem da API, rode com rebuild:
+
+```bash
+docker compose up --build -d
+```
 
 ## Modo 2 - Debug com breakpoints (VS Code ou Visual Studio)
 
@@ -103,6 +109,12 @@ As migrations tambem serao aplicadas automaticamente no startup da API.
 ## Comandos uteis
 
 Subir tudo em container:
+
+```bash
+docker compose up -d
+```
+
+Subir tudo com rebuild da imagem da API (quando necessario):
 
 ```bash
 docker compose up --build -d

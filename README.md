@@ -17,6 +17,43 @@ Obrigatorio para debug com breakpoints:
 - .NET SDK 9.0
 - VS Code com extensao C# ou Visual Studio 2022+
 
+## Links oficiais de instalacao
+
+- Docker Desktop: https://www.docker.com/products/docker-desktop/
+- Docker Compose (documentacao): https://docs.docker.com/compose/
+- Git: https://git-scm.com/downloads
+- .NET SDK 9.0: https://dotnet.microsoft.com/en-us/download/dotnet/9.0
+- VS Code: https://code.visualstudio.com/download
+- Extensao C# para VS Code: https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp
+- Visual Studio 2022 Community: https://visualstudio.microsoft.com/vs/community/
+
+## Instalacao rapida no Windows (winget)
+
+Se voce usa Windows, pode instalar o basico com os comandos abaixo no PowerShell:
+
+```powershell
+winget install --id Git.Git -e
+winget install --id Docker.DockerDesktop -e
+winget install --id Microsoft.DotNet.SDK.9 -e
+winget install --id Microsoft.VisualStudioCode -e
+```
+
+Instalar a extensao C# no VS Code via terminal:
+
+```powershell
+code --install-extension ms-dotnettools.csharp
+```
+
+Validar instalacoes:
+
+```powershell
+git --version
+docker version
+docker compose version
+dotnet --version
+code --version
+```
+
 ## Primeiro passo (igual para todos)
 
 1. Clone o repositorio:

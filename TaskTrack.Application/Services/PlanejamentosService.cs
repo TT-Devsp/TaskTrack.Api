@@ -1,6 +1,8 @@
 using TaskTrack.Application.DTOs;
 using TaskTrack.Application.Interfaces;
+using TaskTrack.Application.Mappers;
 using TaskTrack.Domain.Entities;
+using TaskTrack.Domain.Enums;
 using TaskTrack.Domain.Interfaces;
 
 namespace TaskTrack.Application.Services;
@@ -10,17 +12,21 @@ public sealed class PlanejamentosService : IPlanejamentosService
     private const int ObservacoesMaxLength = 1000;
     private const int MaterialNomeMaxLength = 150;
     private readonly IPlanejamentosRepository _planejamentosRepository;
+    private readonly ISolicitacoesRepository _solicitacoesRepository;
 
-    public PlanejamentosService(IPlanejamentosRepository planejamentosRepository)
+    public PlanejamentosService(
+        IPlanejamentosRepository planejamentosRepository,
+        ISolicitacoesRepository solicitacoesRepository)
     {
         _planejamentosRepository = planejamentosRepository;
+        _solicitacoesRepository = solicitacoesRepository;
     }
 
     public async Task<IReadOnlyCollection<PlanejamentoResponse>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var planejamentos = await _planejamentosRepository.GetAllAsync(cancellationToken);
         var usuariosPorId = await BuildUsuariosLookupAsync(planejamentos, cancellationToken);
-        return planejamentos.Select(p => ToResponse(p, usuariosPorId)).ToList();
+        return planejamentos.Select(p => PlanejamentoMapper.ToResponse(p, usuariosPorId)).ToList();
     }
 
     public async Task<PlanejamentoResponse?> GetBySolicitacaoIdAsync(Guid solicitacaoId, CancellationToken cancellationToken = default)
@@ -32,7 +38,7 @@ public sealed class PlanejamentosService : IPlanejamentosService
         }
 
         var usuariosPorId = await BuildUsuariosLookupAsync([planejamento], cancellationToken);
-        return ToResponse(planejamento, usuariosPorId);
+        return PlanejamentoMapper.ToResponse(planejamento, usuariosPorId);
     }
 
     public async Task<PlanejamentoResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -44,17 +50,33 @@ public sealed class PlanejamentosService : IPlanejamentosService
         }
 
         var usuariosPorId = await BuildUsuariosLookupAsync([planejamento], cancellationToken);
-        return ToResponse(planejamento, usuariosPorId);
+        return PlanejamentoMapper.ToResponse(planejamento, usuariosPorId);
     }
 
     public async Task<PlanejamentoResponse> CreateAsync(CreatePlanejamentoRequest request, CancellationToken cancellationToken = default)
     {
         ValidateDatas(request.DataInicioPrevista, request.DataFimPrevista);
 
-        var solicitacaoExists = await _planejamentosRepository.SolicitacaoExistsAsync(request.SolicitacaoId, cancellationToken);
-        if (!solicitacaoExists)
+        var solicitacao = await _solicitacoesRepository.GetByIdForUpdateAsync(request.SolicitacaoId, cancellationToken);
+        if (solicitacao is null)
         {
             throw new KeyNotFoundException("Solicitacao informada nao foi encontrada.");
+        }
+
+        var planejamentoExistente = await _planejamentosRepository.GetBySolicitacaoIdAsync(request.SolicitacaoId, cancellationToken);
+        if (planejamentoExistente is not null)
+        {
+            throw new InvalidOperationException("Solicitacao ja possui planejamento.");
+        }
+
+        if (solicitacao.Status != SolicitacaoStatus.EmPlanejamento)
+        {
+            throw new InvalidOperationException("Solicitacao precisa estar em planejamento para criar o plano.");
+        }
+
+        if (solicitacao.GestorResponsavelId.HasValue && solicitacao.GestorResponsavelId != request.GestorId)
+        {
+            throw new UnauthorizedAccessException("Solicitacao ja esta atribuida a outro gestor para planejamento.");
         }
 
         var responsavelIds = NormalizeResponsavelIds(request.ResponsavelIds);
@@ -79,13 +101,16 @@ public sealed class PlanejamentosService : IPlanejamentosService
             Materiais = materiais
         };
 
+        solicitacao.GestorResponsavelId ??= request.GestorId;
+        solicitacao.Status = SolicitacaoStatus.Planejada;
+
         await _planejamentosRepository.AddAsync(planejamento, cancellationToken);
         await _planejamentosRepository.SaveChangesAsync(cancellationToken);
 
         var persisted = await _planejamentosRepository.GetByIdAsync(planejamento.Id, cancellationToken)
             ?? throw new InvalidOperationException("Nao foi possivel recuperar o planejamento apos persistencia.");
 
-        return ToResponse(persisted, usuariosResponsaveis);
+        return PlanejamentoMapper.ToResponse(persisted, usuariosResponsaveis);
     }
 
     public async Task<PlanejamentoResponse> UpdateAsync(Guid id, UpdatePlanejamentoRequest request, CancellationToken cancellationToken = default)
@@ -129,7 +154,7 @@ public sealed class PlanejamentosService : IPlanejamentosService
         var persisted = await _planejamentosRepository.GetByIdAsync(planejamento.Id, cancellationToken)
             ?? throw new InvalidOperationException("Nao foi possivel recuperar o planejamento apos atualizacao.");
 
-        return ToResponse(persisted, usuariosResponsaveis);
+        return PlanejamentoMapper.ToResponse(persisted, usuariosResponsaveis);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
@@ -245,30 +270,4 @@ public sealed class PlanejamentosService : IPlanejamentosService
         return value;
     }
 
-    private static PlanejamentoResponse ToResponse(
-        Planejamento planejamento,
-        IReadOnlyDictionary<Guid, Usuario> usuariosPorId)
-    {
-        return new PlanejamentoResponse(
-            planejamento.Id,
-            planejamento.SolicitacaoId,
-            planejamento.DataInicioPrevista,
-            planejamento.DataFimPrevista,
-            planejamento.Observacoes,
-            planejamento.Responsaveis
-                .Select(x =>
-                {
-                    usuariosPorId.TryGetValue(x.UsuarioId, out var usuario);
-
-                    return new PlanejamentoResponsavelResponse(
-                        x.UsuarioId,
-                        usuario is null
-                            ? null
-                            : new UsuarioResponse(usuario.Id, usuario.UserName, usuario.Email));
-                })
-                .ToList(),
-            planejamento.Materiais
-                .Select(x => new PlanejamentoMaterialResponse(x.Nome, x.Quantidade))
-                .ToList());
-    }
 }

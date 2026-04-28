@@ -1,0 +1,126 @@
+{
+  "info": {
+    "name": "TaskTrack.Api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5083" },
+    { "key": "solicitacaoId", "value": "" },
+    { "key": "solicitanteId", "value": "" },
+    { "key": "gestorAprovadorId", "value": "" },
+    { "key": "gestorPlanejadorId", "value": "" },
+    { "key": "tecnicoId", "value": "" },
+    { "key": "responsavelId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/health", "host": ["{{baseUrl}}"], "path": ["api", "health"] }
+      }
+    },
+    {
+      "name": "Solicitacoes - Criar",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/api/solicitacoes", "host": ["{{baseUrl}}"], "path": ["api", "solicitacoes"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Troca de lampadas\",\n  \"descricao\": \"Sala 201\",\n  \"localizacao\": \"Bloco A\",\n  \"solicitanteId\": \"{{solicitanteId}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Solicitacoes - Listar pendentes",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/solicitacoes/pendentes", "host": ["{{baseUrl}}"], "path": ["api", "solicitacoes", "pendentes"] }
+      }
+    },
+    {
+      "name": "Solicitacoes - Listar aprovadas (EmPlanejamento)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/solicitacoes/aprovadas", "host": ["{{baseUrl}}"], "path": ["api", "solicitacoes", "aprovadas"] }
+      }
+    },
+    {
+      "name": "Solicitacoes - Listar em planejamento",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/solicitacoes/em-planejamento", "host": ["{{baseUrl}}"], "path": ["api", "solicitacoes", "em-planejamento"] }
+      }
+    },
+    {
+      "name": "Solicitacoes - Listar planejadas",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/solicitacoes/planejadas", "host": ["{{baseUrl}}"], "path": ["api", "solicitacoes", "planejadas"] }
+      }
+    },
+    {
+      "name": "Solicitacoes - Listar em andamento",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/solicitacoes/em-andamento", "host": ["{{baseUrl}}"], "path": ["api", "solicitacoes", "em-andamento"] }
+      }
+    },
+    {
+      "name": "Solicitacoes - Listar concluidas",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/solicitacoes/concluidas", "host": ["{{baseUrl}}"], "path": ["api", "solicitacoes", "concluidas"] }
+      }
+    },
+    {
+      "name": "Aprovacoes - Criar",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/api/aprovacoes", "host": ["{{baseUrl}}"], "path": ["api", "aprovacoes"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"solicitacaoId\": \"{{solicitacaoId}}\",\n  \"gestorId\": \"{{gestorAprovadorId}}\",\n  \"aprovado\": true,\n  \"observacao\": \"Aprovado\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Planejamentos - Criar",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/api/planejamentos", "host": ["{{baseUrl}}"], "path": ["api", "planejamentos"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"solicitacaoId\": \"{{solicitacaoId}}\",\n  \"gestorId\": \"{{gestorPlanejadorId}}\",\n  \"dataInicioPrevista\": \"2026-04-29T14:03:59.2743561Z\",\n  \"dataFimPrevista\": \"2026-04-30T14:03:59.2799256Z\",\n  \"observacoes\": \"Planejamento inicial\",\n  \"responsavelIds\": [\n    \"{{responsavelId}}\"\n  ],\n  \"materiais\": [\n    {\n      \"nome\": \"Lampada\",\n      \"quantidade\": 4\n    }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "Execucoes - Iniciar",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/api/execucoes/iniciar", "host": ["{{baseUrl}}"], "path": ["api", "execucoes", "iniciar"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"solicitacaoId\": \"{{solicitacaoId}}\",\n  \"tecnicoId\": \"{{tecnicoId}}\",\n  \"observacao\": \"Inicio\",\n  \"status\": 0\n}"
+        }
+      }
+    },
+    {
+      "name": "Execucoes - Atualizar status",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": { "raw": "{{baseUrl}}/api/execucoes/{{solicitacaoId}}/status", "host": ["{{baseUrl}}"], "path": ["api", "execucoes", "{{solicitacaoId}}", "status"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tecnicoId\": \"{{tecnicoId}}\",\n  \"status\": 5,\n  \"observacao\": \"Concluido\"\n}"
+        }
+      }
+    }
+  ]
+}

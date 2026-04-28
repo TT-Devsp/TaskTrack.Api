@@ -31,6 +31,12 @@ public static class DependencyInjection
 
         services.AddScoped<ISolicitacoesRepository, SolicitacoesRepository>();
         services.AddScoped<ISolicitacoesService, SolicitacoesService>();
+        services.AddScoped<IPlanejamentosRepository, PlanejamentosRepository>();
+        services.AddScoped<IPlanejamentosService, PlanejamentosService>();
+        services.AddScoped<IAprovacoesRepository, AprovacoesRepository>();
+        services.AddScoped<IAprovacoesService, AprovacoesService>();
+        services.AddScoped<IExecucoesRepository, ExecucoesRepository>();
+        services.AddScoped<IExecucoesService, ExecucoesService>();
 
         return services;
     }

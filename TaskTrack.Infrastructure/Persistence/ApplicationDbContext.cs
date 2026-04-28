@@ -35,7 +35,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.Property(x => x.Status).HasColumnName("status").IsRequired();
             entity.Property(x => x.DataCriacao).HasColumnName("data_criacao").HasColumnType("timestamp(0) without time zone").IsRequired();
             entity.Property(x => x.SolicitanteId).HasColumnName("solicitante_id").IsRequired();
+            entity.Property(x => x.GestorResponsavelId).HasColumnName("gestor_responsavel_id");
             entity.HasIndex(x => x.SolicitanteId);
+            entity.HasIndex(x => x.GestorResponsavelId);
         });
 
         builder.Entity<AprovacaoSolicitacao>(entity =>

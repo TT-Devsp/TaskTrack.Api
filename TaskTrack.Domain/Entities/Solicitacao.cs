@@ -1,3 +1,5 @@
+using TaskTrack.Domain.Enums;
+
 namespace TaskTrack.Domain.Entities;
 
 public class Solicitacao
@@ -6,9 +8,10 @@ public class Solicitacao
     public string Titulo { get; set; } = string.Empty;
     public string? Descricao { get; set; }
     public string Localizacao { get; set; } = string.Empty;
-    public int Status { get; set; }
+    public SolicitacaoStatus Status { get; set; }
     public DateTime DataCriacao { get; set; }
     public Guid SolicitanteId { get; set; }
+    public Guid? GestorResponsavelId { get; set; }
 
     public ICollection<AprovacaoSolicitacao> Aprovacoes { get; set; } = new List<AprovacaoSolicitacao>();
     public ICollection<Planejamento> Planejamentos { get; set; } = new List<Planejamento>();

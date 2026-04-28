@@ -1,6 +1,8 @@
 using TaskTrack.Application.DTOs;
 using TaskTrack.Application.Interfaces;
+using TaskTrack.Application.Mappers;
 using TaskTrack.Domain.Entities;
+using TaskTrack.Domain.Enums;
 using TaskTrack.Domain.Interfaces;
 
 namespace TaskTrack.Application.Services;
@@ -52,7 +54,7 @@ public sealed class SolicitacoesService : ISolicitacoesService
             Titulo = titulo,
             Descricao = string.IsNullOrWhiteSpace(request.Descricao) ? null : request.Descricao.Trim(),
             Localizacao = localizacao,
-            Status = 0,
+            Status = SolicitacaoStatus.Pendente,
             DataCriacao = DateTime.Now,
             SolicitanteId = request.SolicitanteId
         };
@@ -63,7 +65,7 @@ public sealed class SolicitacoesService : ISolicitacoesService
         var solicitacaoPersistida = await _solicitacoesRepository.GetByIdAsync(solicitacao.Id, cancellationToken)
             ?? throw new InvalidOperationException("Nao foi possivel recuperar a solicitacao apos persistencia.");
 
-        return ToResponse(solicitacaoPersistida);
+        return SolicitacaoMapper.ToResponse(solicitacaoPersistida);
     }
 
     public async Task<SolicitacaoResponse> UpdateAsync(Guid id, UpdateSolicitacaoRequest request, Guid solicitanteId, CancellationToken cancellationToken = default)
@@ -105,7 +107,7 @@ public sealed class SolicitacoesService : ISolicitacoesService
 
         await _solicitacoesRepository.SaveChangesAsync(cancellationToken);
 
-        return ToResponse(solicitacao);
+        return SolicitacaoMapper.ToResponse(solicitacao);
     }
 
     public async Task DeleteAsync(Guid id, Guid solicitanteId, CancellationToken cancellationToken = default)
@@ -128,7 +130,7 @@ public sealed class SolicitacoesService : ISolicitacoesService
         var solicitacoes = await _solicitacoesRepository.GetAllAsync(cancellationToken);
 
         return solicitacoes
-            .Select(ToResponse)
+            .Select(SolicitacaoMapper.ToResponse)
             .ToList();
     }
 
@@ -140,7 +142,27 @@ public sealed class SolicitacoesService : ISolicitacoesService
             return null;
         }
 
-        return ToResponse(solicitacao);
+        return SolicitacaoMapper.ToResponse(solicitacao);
+    }
+
+    public async Task<IReadOnlyCollection<SolicitacaoComGestorResponse>> GetPendentesAsync(CancellationToken cancellationToken = default)
+    {
+        var solicitacoes = await _solicitacoesRepository.GetPendentesAsync(cancellationToken);
+        return solicitacoes.Select(SolicitacaoMapper.ToResponseComGestor).ToList();
+    }
+
+    public async Task<IReadOnlyCollection<SolicitacaoComGestorResponse>> GetByStatusAsync(
+        SolicitacaoStatus status,
+        CancellationToken cancellationToken = default)
+    {
+        var solicitacoes = await _solicitacoesRepository.GetByStatusAsync(status, cancellationToken);
+        return solicitacoes.Select(SolicitacaoMapper.ToResponseComGestor).ToList();
+    }
+
+    public async Task<IReadOnlyCollection<SolicitacaoComGestorResponse>> GetByGestorIdAsync(Guid gestorId, CancellationToken cancellationToken = default)
+    {
+        var solicitacoes = await _solicitacoesRepository.GetByGestorIdAsync(gestorId, cancellationToken);
+        return solicitacoes.Select(SolicitacaoMapper.ToResponseComGestor).ToList();
     }
 
     private static void ValidateSolicitanteOwnership(Solicitacao solicitacao, Guid solicitanteId)
@@ -160,15 +182,4 @@ public sealed class SolicitacoesService : ISolicitacoesService
         }
     }
 
-    private static SolicitacaoResponse ToResponse(Solicitacao solicitacao)
-    {
-        return new SolicitacaoResponse(
-            solicitacao.Id,
-            solicitacao.Titulo,
-            solicitacao.Descricao,
-            solicitacao.Localizacao,
-            solicitacao.Status,
-            solicitacao.DataCriacao,
-            solicitacao.SolicitanteId);
-    }
 }

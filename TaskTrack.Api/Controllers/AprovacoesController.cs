@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskTrack.Application.DTOs;
 using TaskTrack.Application.Interfaces;
+using TaskTrack.Application.Constants;
 
 namespace TaskTrack.Api.Controllers;
 
@@ -9,6 +11,7 @@ namespace TaskTrack.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = Roles.Admin + "," + Roles.Gestor)]
 public class AprovacoesController : ControllerBase
 {
     private readonly IAprovacoesService _aprovacoesService;

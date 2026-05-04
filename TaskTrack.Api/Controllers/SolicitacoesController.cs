@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskTrack.Application.DTOs;
 using TaskTrack.Application.Interfaces;
 using TaskTrack.Domain.Enums;
+using TaskTrack.Application.Constants;
 
 namespace TaskTrack.Api.Controllers;
 
@@ -10,6 +12,7 @@ namespace TaskTrack.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = Roles.Admin + "," + Roles.Solicitante + "," + Roles.Gestor)]
 public class SolicitacoesController : ControllerBase
 {
     private readonly ISolicitacoesService _solicitacoesService;

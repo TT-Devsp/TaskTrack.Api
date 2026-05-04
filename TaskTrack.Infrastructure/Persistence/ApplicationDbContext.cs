@@ -19,6 +19,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<PlanejamentoResponsavel> PlanejamentoResponsaveis => Set<PlanejamentoResponsavel>();
     public DbSet<PlanejamentoMaterial> PlanejamentoMateriais => Set<PlanejamentoMaterial>();
     public DbSet<Execucao> Execucoes => Set<Execucao>();
+    public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -157,6 +158,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .WithMany()
             .HasForeignKey(x => x.AtualizadoPorId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.Entity<UserProfile>(entity =>
+        {
+            entity.ToTable("user_profiles");
+            entity.HasKey(x => x.UserId);
+            entity.Property(x => x.UserId).HasColumnName("user_id");
+            entity.Property(x => x.FullName).HasColumnName("full_name").HasMaxLength(200).IsRequired();
+
+            entity.HasOne<ApplicationUser>()
+                .WithOne()
+                .HasForeignKey<UserProfile>(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }
 

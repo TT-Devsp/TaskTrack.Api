@@ -11,7 +11,7 @@ namespace TaskTrack.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = Roles.Admin + "," + Roles.Gestor)]
+[Authorize] // Qualquer usuario autenticado
 public class AprovacoesController : ControllerBase
 {
     private readonly IAprovacoesService _aprovacoesService;

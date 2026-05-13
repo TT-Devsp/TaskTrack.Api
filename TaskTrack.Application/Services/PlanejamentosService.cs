@@ -55,7 +55,9 @@ public sealed class PlanejamentosService : IPlanejamentosService
 
     public async Task<PlanejamentoResponse> CreateAsync(CreatePlanejamentoRequest request, CancellationToken cancellationToken = default)
     {
-        ValidateDatas(request.DataInicioPrevista, request.DataFimPrevista);
+        var dataInicioUtc = NormalizeToUtc(request.DataInicioPrevista);
+        var dataFimUtc = NormalizeToUtc(request.DataFimPrevista);
+        ValidateDatas(dataInicioUtc, dataFimUtc);
 
         var solicitacao = await _solicitacoesRepository.GetByIdForUpdateAsync(request.SolicitacaoId, cancellationToken);
         if (solicitacao is null)
@@ -74,11 +76,6 @@ public sealed class PlanejamentosService : IPlanejamentosService
             throw new InvalidOperationException("Solicitacao precisa estar em planejamento para criar o plano.");
         }
 
-        if (solicitacao.GestorResponsavelId.HasValue && solicitacao.GestorResponsavelId != request.GestorId)
-        {
-            throw new UnauthorizedAccessException("Solicitacao ja esta atribuida a outro gestor para planejamento.");
-        }
-
         var responsavelIds = NormalizeResponsavelIds(request.ResponsavelIds);
         var usuariosResponsaveis = await ValidateAndGetResponsaveisAsync(responsavelIds, cancellationToken);
 
@@ -88,8 +85,8 @@ public sealed class PlanejamentosService : IPlanejamentosService
         {
             Id = Guid.NewGuid(),
             SolicitacaoId = request.SolicitacaoId,
-            DataInicioPrevista = request.DataInicioPrevista,
-            DataFimPrevista = request.DataFimPrevista,
+            DataInicioPrevista = dataInicioUtc,
+            DataFimPrevista = dataFimUtc,
             Observacoes = NormalizeObservacoes(request.Observacoes),
             Responsaveis = responsavelIds
                 .Select(id => new PlanejamentoResponsavel
@@ -115,7 +112,9 @@ public sealed class PlanejamentosService : IPlanejamentosService
 
     public async Task<PlanejamentoResponse> UpdateAsync(Guid id, UpdatePlanejamentoRequest request, CancellationToken cancellationToken = default)
     {
-        ValidateDatas(request.DataInicioPrevista, request.DataFimPrevista);
+        var dataInicioUtc = NormalizeToUtc(request.DataInicioPrevista);
+        var dataFimUtc = NormalizeToUtc(request.DataFimPrevista);
+        ValidateDatas(dataInicioUtc, dataFimUtc);
 
         var planejamento = await _planejamentosRepository.GetByIdForUpdateAsync(id, cancellationToken);
         if (planejamento is null)
@@ -128,8 +127,8 @@ public sealed class PlanejamentosService : IPlanejamentosService
 
         var materiais = BuildMateriais(request.Materiais);
 
-        planejamento.DataInicioPrevista = request.DataInicioPrevista;
-        planejamento.DataFimPrevista = request.DataFimPrevista;
+        planejamento.DataInicioPrevista = dataInicioUtc;
+        planejamento.DataFimPrevista = dataFimUtc;
         planejamento.Observacoes = NormalizeObservacoes(request.Observacoes);
 
         planejamento.Responsaveis.Clear();
@@ -175,6 +174,11 @@ public sealed class PlanejamentosService : IPlanejamentosService
         {
             throw new ArgumentException("A data fim prevista nao pode ser anterior a data inicio prevista.");
         }
+    }
+
+    private static DateTimeOffset? NormalizeToUtc(DateTimeOffset? value)
+    {
+        return value?.ToUniversalTime();
     }
 
     private static IReadOnlyCollection<Guid> NormalizeResponsavelIds(IReadOnlyCollection<Guid>? responsavelIds)

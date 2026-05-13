@@ -1,0 +1,62 @@
+﻿{
+    "baseUrl":  "http://localhost:8080",
+    "ids":  {
+                "admin":  "7997d36c-eec9-46a9-8ead-7431475cbd8c",
+                "tecnico":  "60e4b147-dda1-4e97-ae11-f6229f42f027",
+                "gestor":  "0a7b49a3-50c5-4522-93ea-e708b01d59d3",
+                "solicitante":  "4fc2c8d3-2d22-4e6f-82de-3806d355d11b"
+            },
+    "solicitacaoId":  "b7795604-45b5-4944-beb7-afe5a7cf2a31",
+    "planejamentoId":  "5e363592-1b4d-4551-99f5-b79dce7ce449",
+    "execucaoId":  "a533744c-95e9-45ff-9fda-dd89061228cc",
+    "aprovacaoId":  "5eb2e463-e980-424f-915a-c21e3428b886",
+    "payloads":  {
+                     "createSolicitacao":  {
+                                               "descricao":  "Sala 201",
+                                               "localizacao":  "Bloco A",
+                                               "titulo":  "Troca de lampadas",
+                                               "solicitanteId":  "4fc2c8d3-2d22-4e6f-82de-3806d355d11b"
+                                           },
+                     "aprovacao":  {
+                                       "aprovado":  true,
+                                       "solicitacaoId":  "b7795604-45b5-4944-beb7-afe5a7cf2a31",
+                                       "gestorId":  "0a7b49a3-50c5-4522-93ea-e708b01d59d3",
+                                       "observacao":  "Aprovado para planejamento"
+                                   },
+                     "planejamento":  {
+                                          "observacoes":  "Planejamento inicial",
+                                          "dataInicioPrevista":  "2026-05-05T03:44:36.9524553Z",
+                                          "responsavelIds":  [
+                                                                 "60e4b147-dda1-4e97-ae11-f6229f42f027"
+                                                             ],
+                                          "gestorId":  "0a7b49a3-50c5-4522-93ea-e708b01d59d3",
+                                          "materiais":  [
+                                                            {
+                                                                "quantidade":  4,
+                                                                "nome":  "Lampada"
+                                                            }
+                                                        ],
+                                          "dataFimPrevista":  "2026-05-06T03:44:36.9524553Z",
+                                          "solicitacaoId":  "b7795604-45b5-4944-beb7-afe5a7cf2a31"
+                                      },
+                     "startExecucao":  {
+                                           "observacao":  "Inicio",
+                                           "status":  0,
+                                           "solicitacaoId":  "b7795604-45b5-4944-beb7-afe5a7cf2a31",
+                                           "tecnicoId":  "60e4b147-dda1-4e97-ae11-f6229f42f027"
+                                       },
+                     "updateExecucao":  {
+                                            "observacao":  "Concluido",
+                                            "status":  5,
+                                            "tecnicoId":  "60e4b147-dda1-4e97-ae11-f6229f42f027"
+                                        },
+                     "adminRoleAssignGestor":  {
+                                                   "userId":  "0a7b49a3-50c5-4522-93ea-e708b01d59d3",
+                                                   "newRole":  "Gestor"
+                                               },
+                     "adminRoleAssignTecnico":  {
+                                                    "userId":  "60e4b147-dda1-4e97-ae11-f6229f42f027",
+                                                    "newRole":  "Tecnico"
+                                                }
+                 }
+}

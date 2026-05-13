@@ -4,15 +4,15 @@ services:
     container_name: tasktrack-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB:-tasktrack_db}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tasktrack_db
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-tasktrack_db}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tasktrack_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,13 +29,10 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${POSTGRES_DB:-tasktrack_db};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}
-      Jwt__Key: ${JWT_KEY}
-      Jwt__Issuer: ${JWT_ISSUER:-TaskTrack.Api}
-      Jwt__Audience: ${JWT_AUDIENCE:-TaskTrack.Client}
-      Jwt__ExpiryHours: ${JWT_EXPIRY_HOURS:-24}
+      # Override appsettings.json via environment variables
+      ConnectionStrings__DefaultConnection: Host=host.docker.internal;Port=5433;Database=tasktrack_db;Username=postgres;Password=postgres
     ports:
-      - "${API_PORT:-8080}:8080"
+      - "8080:8080"
 
 volumes:
   postgres_data:

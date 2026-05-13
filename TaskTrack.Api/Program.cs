@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using TaskTrack.Infrastructure;
 using TaskTrack.Infrastructure.Persistence;
 
@@ -9,6 +10,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// CORS para permitir requisições do frontend React
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+            ?? new[] { "http://localhost:3000", "http://localhost:5173" };
+
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -47,14 +63,30 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (!string.IsNullOrWhiteSpace(connectionString))
+{
+    var safeConn = Regex.Replace(connectionString, "Password=[^;]+", "Password=***", RegexOptions.IgnoreCase);
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("Database connection: {ConnectionString}", safeConn);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else 
+{
+    // Só usa redirecionamento em produção
+    app.UseHttpsRedirection();
+}
 
 app.UseHttpsRedirection();
+
+// CORS deve vir PRIMEIRO (antes de Authentication)
+app.UseCors("AllowReactApp");
 
 // UseAuthentication deve vir ANTES de UseAuthorization
 app.UseAuthentication();

@@ -25,6 +25,26 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
         base.OnModelCreating(builder);
 
+        // 1. CONFIGURAÇÃO DE TABLE SPLITTING (User Domínio + ApplicationUser Identity)
+        // Isso resolve o erro de duas entidades mapeadas para a mesma tabela 'AspNetUsers'
+        builder.Entity<User>(entity =>
+        {
+            entity.ToTable("AspNetUsers");
+            
+            // Vincula o User do Domínio ao ApplicationUser da Infraestrutura pela mesma Primary Key
+            entity.HasOne<ApplicationUser>()
+                .WithOne()
+                .HasForeignKey<User>(u => u.Id)
+                .IsRequired();
+
+            // Mapeia propriedades para as colunas existentes do Identity
+            entity.Property(u => u.UserName).HasColumnName("UserName");
+            entity.Property(u => u.Email).HasColumnName("Email");
+            entity.Property(u => u.NormalizedEmail).HasColumnName("NormalizedEmail");
+            entity.Property(u => u.NormalizedUserName).HasColumnName("NormalizedUserName");
+        });
+
+        // 2. CONFIGURAÇÃO DA SOLICITAÇÃO
         builder.Entity<Solicitacao>(entity =>
         {
             entity.ToTable("solicitacoes");
@@ -34,13 +54,23 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.Property(x => x.Descricao).HasColumnName("descricao");
             entity.Property(x => x.Localizacao).HasColumnName("localizacao").HasMaxLength(500).IsRequired();
             entity.Property(x => x.Status).HasColumnName("status").IsRequired();
+            entity.Property(x => x.Prioridade).HasColumnName("Prioridade").IsRequired();
             entity.Property(x => x.DataCriacao).HasColumnName("data_criacao").HasColumnType("timestamp(0) without time zone").IsRequired();
+            entity.Property(x => x.DataLimite).HasColumnName("DataLimite").HasColumnType("timestamp with time zone");
             entity.Property(x => x.SolicitanteId).HasColumnName("solicitante_id").IsRequired();
             entity.Property(x => x.GestorResponsavelId).HasColumnName("gestor_responsavel_id");
+            
+            // Relacionamento com a Entidade User (Domínio)
+            entity.HasOne(x => x.Solicitante)
+                .WithMany()
+                .HasForeignKey(x => x.SolicitanteId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasIndex(x => x.SolicitanteId);
             entity.HasIndex(x => x.GestorResponsavelId);
         });
 
+        // 3. CONFIGURAÇÃO DE APROVAÇÃO
         builder.Entity<AprovacaoSolicitacao>(entity =>
         {
             entity.ToTable("aprovacoes_solicitacao");
@@ -57,10 +87,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 .HasForeignKey(x => x.SolicitacaoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Relacionamento com o Gestor (Identity)
+            entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(x => x.GestorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasIndex(x => x.SolicitacaoId);
             entity.HasIndex(x => x.GestorId);
         });
 
+        // 4. CONFIGURAÇÃO DE PLANEJAMENTO
         builder.Entity<Planejamento>(entity =>
         {
             entity.ToTable("planejamentos");
@@ -79,6 +116,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.HasIndex(x => x.SolicitacaoId);
         });
 
+        // 5. RESPONSÁVEIS PELO PLANEJAMENTO
         builder.Entity<PlanejamentoResponsavel>(entity =>
         {
             entity.ToTable("planejamento_responsaveis");
@@ -92,10 +130,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 .HasForeignKey(x => x.PlanejamentoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(x => x.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasIndex(x => x.PlanejamentoId);
             entity.HasIndex(x => x.UsuarioId);
         });
 
+        // 6. MATERIAIS DO PLANEJAMENTO
         builder.Entity<PlanejamentoMaterial>(entity =>
         {
             entity.ToTable("planejamento_materiais", tableBuilder =>
@@ -113,6 +157,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.HasIndex(x => x.PlanejamentoId);
         });
 
+        // 7. EXECUÇÃO
         builder.Entity<Execucao>(entity =>
         {
             entity.ToTable("execucoes");
@@ -131,34 +176,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 .HasForeignKey(x => x.SolicitacaoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(x => x.AtualizadoPorId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             entity.HasIndex(x => x.SolicitacaoId);
             entity.HasIndex(x => x.AtualizadoPorId);
         });
 
-        builder.Entity<Solicitacao>()
-            .HasOne<ApplicationUser>()
-            .WithMany()
-            .HasForeignKey(x => x.SolicitanteId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<AprovacaoSolicitacao>()
-            .HasOne<ApplicationUser>()
-            .WithMany()
-            .HasForeignKey(x => x.GestorId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<PlanejamentoResponsavel>()
-            .HasOne<ApplicationUser>()
-            .WithMany()
-            .HasForeignKey(x => x.UsuarioId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<Execucao>()
-            .HasOne<ApplicationUser>()
-            .WithMany()
-            .HasForeignKey(x => x.AtualizadoPorId)
-            .OnDelete(DeleteBehavior.SetNull);
-
+        // 8. PERFIL DE USUÁRIO
         builder.Entity<UserProfile>(entity =>
         {
             entity.ToTable("user_profiles");
@@ -173,4 +200,3 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         });
     }
 }
-

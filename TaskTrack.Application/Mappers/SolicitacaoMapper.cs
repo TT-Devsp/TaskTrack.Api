@@ -13,7 +13,10 @@ public static class SolicitacaoMapper
             solicitacao.Descricao,
             solicitacao.Localizacao,
             solicitacao.Status,
+            solicitacao.Prioridade,
             solicitacao.DataCriacao,
+            solicitacao.DataLimite,
+            solicitacao.Solicitante?.UserName ?? "Usuário Desconhecido",
             solicitacao.SolicitanteId);
     }
 
@@ -25,8 +28,11 @@ public static class SolicitacaoMapper
             solicitacao.Descricao,
             solicitacao.Localizacao,
             solicitacao.Status,
+            solicitacao.Prioridade,
             solicitacao.DataCriacao,
+            solicitacao.DataLimite,
             solicitacao.SolicitanteId,
+            solicitacao.Solicitante?.UserName ?? "Usuário Desconhecido",
             solicitacao.GestorResponsavelId);
     }
 }

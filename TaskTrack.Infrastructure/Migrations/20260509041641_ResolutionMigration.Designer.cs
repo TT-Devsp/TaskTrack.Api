@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TaskTrack.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using TaskTrack.Infrastructure.Persistence;
 namespace TaskTrack.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260509041641_ResolutionMigration")]
+    partial class ResolutionMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -330,8 +333,7 @@ namespace TaskTrack.Infrastructure.Migrations
                         .HasColumnName("data_criacao");
 
                     b.Property<DateTime?>("DataLimite")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("DataLimite");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Descricao")
                         .HasColumnType("text")
@@ -348,8 +350,7 @@ namespace TaskTrack.Infrastructure.Migrations
                         .HasColumnName("localizacao");
 
                     b.Property<int>("Prioridade")
-                        .HasColumnType("integer")
-                        .HasColumnName("Prioridade");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("SolicitanteId")
                         .HasColumnType("uuid")
@@ -372,32 +373,6 @@ namespace TaskTrack.Infrastructure.Migrations
                     b.HasIndex("SolicitanteId");
 
                     b.ToTable("solicitacoes", (string)null);
-                });
-
-            modelBuilder.Entity("TaskTrack.Domain.Entities.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text")
-                        .HasColumnName("Email");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("text")
-                        .HasColumnName("NormalizedEmail");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("text")
-                        .HasColumnName("NormalizedUserName");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("text")
-                        .HasColumnName("UserName");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("TaskTrack.Domain.Entities.UserProfile", b =>
@@ -479,20 +454,7 @@ namespace TaskTrack.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers", null, t =>
-                        {
-                            t.Property("Email")
-                                .HasColumnName("ApplicationUser_Email");
-
-                            t.Property("NormalizedEmail")
-                                .HasColumnName("ApplicationUser_NormalizedEmail");
-
-                            t.Property("NormalizedUserName")
-                                .HasColumnName("ApplicationUser_NormalizedUserName");
-
-                            t.Property("UserName")
-                                .HasColumnName("ApplicationUser_UserName");
-                        });
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -620,21 +582,10 @@ namespace TaskTrack.Infrastructure.Migrations
 
             modelBuilder.Entity("TaskTrack.Domain.Entities.Solicitacao", b =>
                 {
-                    b.HasOne("TaskTrack.Domain.Entities.User", "Solicitante")
+                    b.HasOne("TaskTrack.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("SolicitanteId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Solicitante");
-                });
-
-            modelBuilder.Entity("TaskTrack.Domain.Entities.User", b =>
-                {
-                    b.HasOne("TaskTrack.Infrastructure.Identity.ApplicationUser", null)
-                        .WithOne()
-                        .HasForeignKey("TaskTrack.Domain.Entities.User", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

@@ -12,7 +12,7 @@ namespace TaskTrack.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = Roles.Admin)]
+[Authorize] // Qualquer usuario autenticado (temporario)
 public class AdminController : ControllerBase
 {
     private readonly IAdminService _adminService;

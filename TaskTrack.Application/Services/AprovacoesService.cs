@@ -31,6 +31,11 @@ public sealed class AprovacoesService : IAprovacoesService
         if (request.Aprovado)
         {
             solicitacao.Status = SolicitacaoStatus.EmPlanejamento;
+            solicitacao.GestorResponsavelId = request.GestorId;
+        }
+        else
+        {
+            solicitacao.Status = SolicitacaoStatus.EmAnalise;
         }
 
         var aprovacao = new AprovacaoSolicitacao

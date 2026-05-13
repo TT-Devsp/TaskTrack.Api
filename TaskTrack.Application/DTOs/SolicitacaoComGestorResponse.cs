@@ -8,6 +8,9 @@ public sealed record SolicitacaoComGestorResponse(
     string? Descricao,
     string Localizacao,
     SolicitacaoStatus Status,
+    Prioridade Prioridade,
     DateTime DataCriacao,
+    DateTime? DataLimite,
     Guid SolicitanteId,
+    string SolicitanteNome,
     Guid? GestorResponsavelId);

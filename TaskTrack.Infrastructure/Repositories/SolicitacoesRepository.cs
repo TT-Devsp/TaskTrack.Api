@@ -15,16 +15,14 @@ public sealed class SolicitacoesRepository : ISolicitacoesRepository
         _dbContext = dbContext;
     }
 
-    public Task AddAsync(Solicitacao solicitacao, CancellationToken cancellationToken = default)
+    public async Task AddAsync(Solicitacao solicitacao, CancellationToken cancellationToken = default)
     {
-        return _dbContext.Solicitacoes.AddAsync(solicitacao, cancellationToken).AsTask();
+        await _dbContext.Solicitacoes.AddAsync(solicitacao, cancellationToken);
     }
 
     public Task<bool> SolicitanteExistsAsync(Guid solicitanteId, CancellationToken cancellationToken = default)
     {
-        return _dbContext.Users
-            .AsNoTracking()
-            .AnyAsync(x => x.Id == solicitanteId, cancellationToken);
+        return _dbContext.Users.AsNoTracking().AnyAsync(x => x.Id == solicitanteId, cancellationToken);
     }
 
     public Task<bool> HasGestorApprovalAsync(Guid solicitacaoId, CancellationToken cancellationToken = default)
@@ -34,71 +32,56 @@ public sealed class SolicitacoesRepository : ISolicitacoesRepository
             .AnyAsync(x => x.SolicitacaoId == solicitacaoId && x.Aprovado, cancellationToken);
     }
 
-    public Task<Solicitacao?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Solicitacao?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return _dbContext.Solicitacoes
+        return await _dbContext.Solicitacoes
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
     public Task<Solicitacao?> GetByIdForUpdateAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return _dbContext.Solicitacoes
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return _dbContext.Solicitacoes.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public void Remove(Solicitacao solicitacao)
-    {
-        _dbContext.Solicitacoes.Remove(solicitacao);
-    }
+    public void Remove(Solicitacao solicitacao) => _dbContext.Solicitacoes.Remove(solicitacao);
 
     public async Task<IReadOnlyCollection<Solicitacao>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var items = await _dbContext.Solicitacoes
+        return await _dbContext.Solicitacoes
             .AsNoTracking()
             .OrderByDescending(x => x.DataCriacao)
             .ToListAsync(cancellationToken);
-
-        return items;
     }
 
     public async Task<IReadOnlyCollection<Solicitacao>> GetPendentesAsync(CancellationToken cancellationToken = default)
     {
-        var items = await _dbContext.Solicitacoes
-            .AsNoTracking()
-            .Where(x => x.GestorResponsavelId == null
-                        && x.Status == SolicitacaoStatus.Pendente
-                        && !_dbContext.Planejamentos.Any(p => p.SolicitacaoId == x.Id))
+        // MELHORIA: Filtro focado apenas no status Pendente para garantir que apareça na tela de aprovações
+        return await _dbContext.Solicitacoes
+            .Where(x => x.Status == SolicitacaoStatus.Pendente)
             .OrderByDescending(x => x.DataCriacao)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
-
-        return items;
     }
 
     public async Task<IReadOnlyCollection<Solicitacao>> GetByStatusAsync(SolicitacaoStatus status, CancellationToken cancellationToken = default)
     {
-        var items = await _dbContext.Solicitacoes
-            .AsNoTracking()
+        return await _dbContext.Solicitacoes
             .Where(x => x.Status == status)
             .OrderByDescending(x => x.DataCriacao)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
-
-        return items;
     }
 
     public async Task<IReadOnlyCollection<Solicitacao>> GetByGestorIdAsync(Guid gestorId, CancellationToken cancellationToken = default)
     {
-        var items = await _dbContext.Solicitacoes
-            .AsNoTracking()
+        return await _dbContext.Solicitacoes
             .Where(x => x.GestorResponsavelId == gestorId)
             .OrderByDescending(x => x.DataCriacao)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
-
-        return items;
     }
 
-    public Task SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        return _dbContext.SaveChangesAsync(cancellationToken);
-    }
+    public Task SaveChangesAsync(CancellationToken cancellationToken = default) 
+        => _dbContext.SaveChangesAsync(cancellationToken);
 }

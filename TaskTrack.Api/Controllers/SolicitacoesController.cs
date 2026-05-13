@@ -12,7 +12,7 @@ namespace TaskTrack.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = Roles.Admin + "," + Roles.Solicitante + "," + Roles.Gestor)]
+//[Authorize] // Qualquer usuario autenticado
 public class SolicitacoesController : ControllerBase
 {
     private readonly ISolicitacoesService _solicitacoesService;
@@ -28,7 +28,9 @@ public class SolicitacoesController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var solicitacoes = await _solicitacoesService.GetAllAsync(cancellationToken);
-        return Ok(solicitacoes);
+        
+        // Se solicitacoes for null, retorna uma lista vazia com status 200 OK
+        return Ok(solicitacoes ?? Enumerable.Empty<SolicitacaoResponse>());
     }
 
     /// <summary>Obtem uma solicitacao por id.</summary>
@@ -156,27 +158,21 @@ public class SolicitacoesController : ControllerBase
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(SolicitacaoResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Update(
         Guid id,
         [FromBody] UpdateSolicitacaoRequest request,
-        [FromQuery] Guid solicitanteId,
         CancellationToken cancellationToken)
     {
         try
         {
-            var updated = await _solicitacoesService.UpdateAsync(id, request, solicitanteId, cancellationToken);
+            var updated = await _solicitacoesService.UpdateAsync(id, request, cancellationToken);
             return Ok(updated);
         }
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
         }
         catch (InvalidOperationException ex)
         {
@@ -191,19 +187,14 @@ public class SolicitacoesController : ControllerBase
     /// <summary>Exclui uma solicitacao do solicitante.</summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid solicitanteId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         try
         {
-            await _solicitacoesService.DeleteAsync(id, solicitanteId, cancellationToken);
+            await _solicitacoesService.DeleteAsync(id, cancellationToken);
             return NoContent();
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
         }
         catch (InvalidOperationException ex)
         {

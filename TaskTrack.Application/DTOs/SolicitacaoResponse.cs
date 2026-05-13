@@ -8,5 +8,8 @@ public sealed record SolicitacaoResponse(
     string? Descricao,
     string Localizacao,
     SolicitacaoStatus Status,
+    Prioridade Prioridade,
     DateTime DataCriacao,
+    DateTime? DataLimite,
+    string SolicitanteNome,
     Guid SolicitanteId);
